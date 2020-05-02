@@ -17,10 +17,11 @@ def send(  # pylint: disable=too-many-arguments,too-many-locals
     compression: Compression,
     follow_delete: bool,
     previous: Optional[Snapshot] = None,
+    send_options: str = "",
 ) -> None:
     """Send ZFS Snapshot."""
 
-    send_command = _send(current, previous, follow_delete=follow_delete)
+    send_command = _send(current, previous, follow_delete=follow_delete, send_options=send_options)
 
     compress_command, decompress_command = compress.command(compression)
 
@@ -41,7 +42,7 @@ def send(  # pylint: disable=too-many-arguments,too-many-locals
         )
 
 
-def _send(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False) -> str:
+def _send(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False, send_options: str="") -> str:
     options = []  # ["-V"]
 
     if follow_delete:
@@ -50,7 +51,7 @@ def _send(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete:
     if previous is not None:
         options.append(f"-i '{previous.filesystem.name}@{previous.name}'")
 
-    return f"/usr/bin/env - zfs send {' '.join(options)} '{current.filesystem.name}@{current.name}'"
+    return f"/usr/bin/env - zfs send {' '.join(options)} {send_options} '{current.filesystem.name}@{current.name}'"
 
 
 def _receive(remote: FileSystem, current: Snapshot, decompress_command: str) -> str:

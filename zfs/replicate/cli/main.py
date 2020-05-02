@@ -40,6 +40,10 @@ from .click import EnumChoice
     default=Compression.LZ4,
     help="One of: off (no compression), lz4 (fastest), pigz (all rounder), or plzip (best compression).",
 )
+@click.option(
+    "--send-options",
+    help="Verbatim options to use with the zfs send command, e.g. --raw to send encrypted snapshots as is.",
+)
 @click.argument("host", required=True)
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")
 @click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")
@@ -53,6 +57,7 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
     identity_file: str,
     cipher: Cipher,
     compression: Compression,
+    send_options: str,
     host: str,
     remote_fs: FileSystem,
     local_fs: FileSystem,
@@ -99,5 +104,5 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
             (filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
         ]
         task.execute(
-            remote_fs, filesystem_tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command
+            remote_fs, filesystem_tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command, send_options=send_options
         )

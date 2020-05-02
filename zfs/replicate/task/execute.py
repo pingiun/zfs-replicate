@@ -15,6 +15,7 @@ def execute(  # pylint: disable=too-many-arguments
     ssh_command: str,
     follow_delete: bool,
     compression: Compression,
+    send_options: str,
 ) -> None:
     """Execute all tasks."""
 
@@ -32,7 +33,7 @@ def execute(  # pylint: disable=too-many-arguments
             elif action == Action.DESTROY:
                 _destroy(a_tasks, ssh_command=ssh_command)
             elif action == Action.SEND:
-                _send(remote, a_tasks, ssh_command=ssh_command, follow_delete=follow_delete, compression=compression)
+                _send(remote, a_tasks, ssh_command=ssh_command, follow_delete=follow_delete, compression=compression, send_options=send_options)
 
 
 def _create(tasks: List[Task], ssh_command: str) -> None:
@@ -49,7 +50,7 @@ def _destroy(tasks: List[Task], ssh_command: str) -> None:
 
 
 def _send(
-    remote: FileSystem, tasks: List[Task], ssh_command: str, follow_delete: bool, compression: Compression
+    remote: FileSystem, tasks: List[Task], ssh_command: str, follow_delete: bool, compression: Compression, send_options: str
 ) -> None:
     for task in tasks:
         snapshot.send(
@@ -59,4 +60,5 @@ def _send(
             compression=compression,
             follow_delete=follow_delete,
             previous=optional.value(task.snapshot).previous,
+            send_options=send_options,
         )
