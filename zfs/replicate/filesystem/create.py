@@ -34,7 +34,7 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
         error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
         if proc.returncode:
-            if b"successfully created, but not mounted" in error:
+            if b"successfully" in error:
                 return  # Ignore this error.
 
             raise ZFSReplicateError(
