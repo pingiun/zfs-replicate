@@ -34,7 +34,7 @@ def send(  # pylint: disable=too-many-arguments,too-many-locals
     output = output.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
     if proc.returncode:
-        if b"failed to create mountpoint" in error:
+        if b"failed to create mountpoint" in error or b"but it may only be mounted by root" in error:
             return  # Ignore this error.
 
         raise ZFSReplicateError(
